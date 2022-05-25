@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_app/pages/login.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'user/user_main.dart';
 
 class Signup extends StatefulWidget {
   const Signup({Key? key}) : super(key: key);
@@ -27,6 +30,66 @@ class _SignupState extends State<Signup> {
     passwordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  registration() {
+    if (password == confirmPassword) {
+      try {
+        final credential = FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        )
+            .then((value) {
+          FirebaseFirestore.instance
+              .collection('Users')
+              .doc(value.user!.uid)
+              .set({
+            "email": value.user!.email,
+          });
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green,
+            content: Text("Successfully Registered!. Please login!"),
+          ),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Login(),
+          ),
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          print('The password provided is too weak.');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.redAccent,
+              content: Text("The password provided is too weak."),
+            ),
+          );
+        } else if (e.code == 'email-already-in-use') {
+          print('The account already exists for that email.');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.redAccent,
+              content: Text("The account already exists for that email."),
+            ),
+          );
+        }
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      print("Password and confirm password doesnt match");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent,
+          content: Text("Password and confirm password doesnt match"),
+        ),
+      );
+    }
   }
 
   @override
@@ -118,6 +181,7 @@ class _SignupState extends State<Signup> {
                             password = passwordController.text;
                             confirmPassword = confirmPasswordController.text;
                           });
+                          registration();
                         }
                       },
                       child: Text(

@@ -10,12 +10,16 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-          child: Text(
-        'Dashboard',
-        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-      )),
+    return Scaffold(
+      body: ListView(
+        children: [
+          ListTile(
+            title: Text('List item'),
+            leading: Icon(Icons.label),
+            trailing: Text("0"),
+          ),
+        ],
+      ),
     );
   }
 }

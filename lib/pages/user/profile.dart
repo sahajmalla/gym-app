@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Profile extends StatefulWidget {
@@ -8,6 +9,10 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  final userId = FirebaseAuth.instance.currentUser!.uid;
+  final userEmail = FirebaseAuth.instance.currentUser!.email;
+  final userCreationTime =
+      FirebaseAuth.instance.currentUser!.metadata.creationTime;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -15,19 +20,19 @@ class _ProfileState extends State<Profile> {
       child: Column(
         children: [
           Text(
-            'User ID: 123',
+            'User ID: $userId',
             style: TextStyle(fontSize: 18.0),
           ),
           Row(
             children: [
               Text(
-                'Email: sahaj@email.com',
+                'Email: $userEmail',
                 style: TextStyle(fontSize: 18.0),
               ),
             ],
           ),
           Text(
-            'Created: 23/05/2022',
+            'Created:$userCreationTime',
             style: TextStyle(fontSize: 18.0),
           ),
         ],

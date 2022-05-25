@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gym_app/pages/login.dart';
 
 class ChangePassword extends StatefulWidget {
   const ChangePassword({Key? key}) : super(key: key);
@@ -21,6 +23,27 @@ class _ChangePasswordState extends State<ChangePassword> {
     // Clean up the controller when the widget is disposed.
     newPasswordController.dispose();
     super.dispose();
+  }
+
+  final currentUser = FirebaseAuth.instance.currentUser;
+  changePassword() async {
+    try {
+      await currentUser!.updatePassword(newPassword);
+      FirebaseAuth.instance.signOut();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Login(),
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.green,
+          content:
+              Text("Successfully changed password! Please login in again."),
+        ),
+      );
+    } catch (e) {}
   }
 
   @override
@@ -59,6 +82,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                   setState(() {
                     newPassword = newPasswordController.text;
                   });
+                  changePassword();
                 }
               },
               child: Text(

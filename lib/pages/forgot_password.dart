@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_app/pages/login.dart';
 import 'package:gym_app/pages/signup.dart';
@@ -23,6 +24,37 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     // Clean up the controller when the widget is disposed.
     emailController.dispose();
     super.dispose();
+  }
+
+  resetPassword() async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.green,
+          content: Text(
+              "Password reset email has been sent to your registered email!"),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text("No user found for that email."),
+          ),
+        );
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text("Wrong password provided for that user."),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -81,6 +113,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                 setState(() {
                                   email = emailController.text;
                                 });
+                                resetPassword();
                               }
                             },
                             child: Text(
